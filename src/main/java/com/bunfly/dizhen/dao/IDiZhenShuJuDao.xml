@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bunfly.dizhen.dao.IDiZhenShuJuDao">
+<!--    获取一周的地震数据（周图-->
+    <select id="getZhouData" resultType="dizhenshuju">
+        select * from t_dizhenshuju where dizhentime between #{monday} and #{sunday};
+    </select>
+<!--    获取一个月的地震数据（月图）-->
+    <select id="getYueData"  parameterType="string" resultType="dizhenshuju">
+        select  * from t_dizhenshuju where dizhentime  like '${month}%';
+    </select>
+<!--    获取month1到month2两个月份之间的数据，包括month2-->
+    <select id="getDatas" resultType="dizhenshuju">
+        select * from t_dizhenshuju where dizhentime between #{month1} and #{month2};
+    </select>
+<!--    由传过来的地震级别和时间（2019-08）确定发震次数-->
+    <select id="getCiShuByTimeAndJiBie"  resultType="integer">
+        select count(1)   cishu  from t_dizhenshuju where dizhentime like '${time}%' and zhenji like '${jibie}%';
+    </select>
+<!--    由传过来的地震级别和时间(2019-06)取出地震数据-->
+    <select id="getDatasByTimeAndJiBie"  resultType="dizhenshuju">
+        select * from t_dizhenshuju where dizhentime like '${time}%' and zhenji like '${jibie}%';
+    </select>
+<!--    由form表单提交的条件来查询地震数据-->
+    <select id="getDatasByFormChaXun" resultType="dizhenshuju">
+        select
+            *
+        from t_dizhenshuju
+        <where>
+        <if test="dizhentime1!=null and dizhentime2!=null">
+            dizhentime between #{dizhentime1} and #{dizhentime2}
+        </if>
+        <if test="dizhentime1!=null and dizhentime2==null">
+            and dizhentime >= #{dizhentime1}
+        </if>
+        <if test="dizhentime1==null and dizhentime2!=null">
+            and dizhentime &lt;= #{dizhentime2}
+         </if>
+
+        <if test="weidu1!=null and weidu2!=null">
+            and weidu  between #{weidu1} and #{weidu2}
+        </if>
+        <if test="weidu1!=null and weidu2==null">
+            and weidu  >=  #{weidu1}
+        </if>
+        <if test="weidu1==null and weidu2!=null">
+            and   weidu &lt;= #{weidu2}
+        </if>
+
+        <if test="jingdu1!=null and jingdu2!=null">
+            and jingdu between #{jingdu1}  and  #{jingdu2}
+        </if>
+        <if test="jingdu1!=null and jingdu2==null">
+            and jingdu >=  #{jingdu1}
+        </if>
+        <if test="jingdu1==null and jingdu2!=null">
+            and jingdu &lt;= #{jingdu2}
+        </if>
+
+        <if test="shendu1!=null and shendu2!=null">
+            and shendu between #{shendu1}  and  #{shendu2}
+        </if>
+        <if test="shendu1!=null and shendu2==null">
+            and shendu >=  #{shendu1}
+        </if>
+        <if test="shendu1==null and shendu2!=null">
+            and shendu  &lt;=  #{shendu2}
+        </if>
+
+        <if test="zhenji1!=null and zhenji2!=null">
+            and zhenji  between #{zhenji1} and #{zhenji2}
+        </if>
+        <if test="zhenji1!=null and zhenji2==null">
+            and zhenji  >= #{zhenji1}
+        </if>
+        <if test="zhenji1==null and zhenji2!=null">
+            and zhenji &lt;= #{zhenji2}
+        </if>
+    </where>
+
+    </select>
+<!--    获得24或48小时内的数据-->
+    <select id="get24or48" parameterType="integer" resultType="dizhenshuju">
+        select * from t_dizhenshuju  where dizhentime >=  NOW() - interval #{id} hour
+    </select>
+<!--    获得7天或30天内的数据-->
+    <select id="get7or30" parameterType="integer" resultType="dizhenshuju">
+        select * from t_dizhenshuju where date_sub(curdate(), INTERVAL #{id} DAY) &lt;= date(dizhentime);
+    </select>
+<!--    获得一年内的数据-->
+    <select id="getOneYear" parameterType="integer" resultType="dizhenshuju">
+        SELECT * FROM t_dizhenshuju WHERE dizhentime>DATE_SUB(CURDATE(), INTERVAL #{id} YEAR)
+    </select>
+
+<!--    查询1年内6级以上地震-->
+    <select id="sixzhenji" resultType="dizhenshuju">
+select * from t_dizhenshuju WHERE dizhentime>DATE_SUB(CURDATE(), INTERVAL 1 YEAR)  and zhenji >=6;
+    </select>
+<!--    查询1年内5级以上地震-->
+    <select id="fivezhenji" resultType="dizhenshuju">
+        select * from t_dizhenshuju WHERE dizhentime>DATE_SUB(CURDATE(), INTERVAL 1 YEAR)  and zhenji >=5  and zhenji &lt;6;
+
+    </select>
+<!--    查询1年内4级以上地震-->
+    <select id="fourzhenji" resultType="dizhenshuju">
+        select * from t_dizhenshuju WHERE dizhentime>DATE_SUB(CURDATE(), INTERVAL 1 YEAR)  and zhenji >=4  and zhenji &lt;5;
+
+    </select>
+<!--    查询1年内3级以上地震-->
+    <select id="threezhenji" resultType="dizhenshuju">
+        select * from t_dizhenshuju WHERE dizhentime>DATE_SUB(CURDATE(), INTERVAL 1 YEAR)  and zhenji >=3  and zhenji &lt;4;
+
+    </select>
+<!--    查询1年内3级以下地震-->
+    <select id="twozhenji" resultType="dizhenshuju">
+        select * from t_dizhenshuju WHERE dizhentime>DATE_SUB(CURDATE(), INTERVAL 1 YEAR)  and  zhenji &lt;3;
+    </select>
+<!--    由传过来的地震数据id获取该地震数据-->
+    <select id="getShuJuById" parameterType="integer" resultType="dizhenshuju">
+        select * from t_dizhenshuju where dizhenshujuid=#{id};
+    </select>
+<!--    查询出5级以上的地震-->
+    <select id="getfive" resultType="dizhenshuju">
+       select * from t_dizhenshuju WHERE zhenji >=5;
+    </select>
+</mapper>

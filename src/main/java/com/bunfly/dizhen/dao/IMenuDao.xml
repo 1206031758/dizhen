@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bunfly.dizhen.dao.IMenuDao">
+
+    <!-- 根据角色id查找相应的权限 -->
+    <select id="queryMenu" parameterType="integer" resultMap="menumap">
+  		SELECT
+	  		m.menuid,
+			menuname,
+		 	menulink,
+			menusecuryname,
+		 	menupid,
+			roleid
+		FROM
+			t_menu m
+		LEFT JOIN
+			role_menu  r
+		ON
+			m.menuid=r.menuid
+		WHERE
+			roleid=#{id};
+  	</select>
+
+    <resultMap type="menu" id="menumap">
+        <id property="menuid" column="menuid"/>
+        <result property="menuname" column="menuname"/>
+        <result property="menulink" column="menulink"/>
+        <result property="menusecuryname" column="menusecuryname"/>
+        <result property="menupid" column="menupid"/>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bunfly.dizhen.dao.IUserDao">
+
+    <!-- 根据登录名取出用户 -->
+    <select id="login"   parameterType="user"  resultType="user">
+		select * from t_user where loginname=#{loginname} and password=#{password};
+	</select>
+
+<!--    根据用户id获取该用户的所有权限-->
+    <select id="getAllMenusById"   parameterType="integer"  resultType="menu">
+		SELECT
+				t_menu.menuid,
+				t_menu.menuname,
+				t_menu.menulink,
+				t_menu.menusecuryname,
+				t_menu.menupid
+			FROM
+				t_user,
+				t_role,
+				user_role,
+				role_menu,
+				t_menu
+			WHERE
+				t_user.userid=user_role.userid  and t_role.roleid=user_role.roleid
+				and t_role.roleid=role_menu.roleid  and  t_menu.menuid=role_menu.menuid
+				and t_user.userid=#{id};
+	</select>
+
+    <!-- 分页查询出所有的用户的信息 -->
+    <select id="queryPage" parameterType="pagemodel" resultMap="usermap">
+  			SELECT
+  				userid,
+  				username,
+  				usersex,
+  				loginname,
+  				password
+  			FROM
+  				t_user
+  			LIMIT
+  				#{begin},#{pageSize}
+  		</select>
+
+    <resultMap type="user" id="usermap">
+        <id property="userid" column="userid"/>
+        <result property="username" column="username"/>
+        <result property="usersex" column="usersex"/>
+        <result property="loginname" column="loginname"/>
+        <result property="password" column="password"/>
+        <collection property="roles" ofType="role" select="com.bunfly.dizhen.dao.IRoleDao.queryRole" column="userid" >
+            <id property="roleid" column="roleid"/>
+            <result property="rolename" column="rolename"/>
+            <result property="rolememo" column="rolememo"/>
+        </collection>
+    </resultMap>
+
+    <!-- 总共有多少用户 -->
+    <select id="queryCount" resultType="integer">
+			SELECT
+				count(1)
+			FROM
+				t_user
+		</select>
+
+	<!-- 添加一个用户 -->
+	<insert id="addUser" parameterType="user">
+		<selectKey  keyProperty="userid" order="AFTER" resultType="integer">
+			select last_insert_id()
+		</selectKey>
+		insert into t_user
+		(username,usersex,loginname,password)
+		value
+		(#{username},#{usersex},#{loginname},#{password});
+	</insert>
+
+	<!-- 在user_role中添加user和role的对应关系 -->
+	<insert id="addmiddle" >
+  			insert into user_role
+  				(userid,roleid)
+  			value
+  				(#{userid},#{roleid});
+  		</insert>
+
+	<!-- 删除一个用户-->
+	<delete id="deleteUser" parameterType="integer">
+  			delete from t_user where userid=#{id};
+  		</delete>
+	<!-- 根据userid删除中间表user_role -->
+	<delete id="deletemiddle" parameterType="integer">
+  			delete from user_role where userid=#{id};
+  		</delete>
+
+	<select id="queryUser" parameterType="integer" resultMap="usermap">
+  			SELECT
+  				userid,
+  				username,
+  				usersex,
+  				loginname,
+  				password
+  			FROM
+  				t_user
+  			WHERE
+  				userid=#{id};
+  		</select>
+
+	<!-- 修改用户信息-->
+	<update id="updateUser" parameterType="user">
+  			update
+  				t_user
+  			set
+  				username=#{username},
+  				usersex=#{usersex},
+  				loginname=#{loginname},
+  				password=#{password}
+  			where
+  				userid=#{userid};
+  		</update>
+</mapper>

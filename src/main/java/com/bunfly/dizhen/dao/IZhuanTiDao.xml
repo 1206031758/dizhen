@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bunfly.dizhen.dao.IZhuanTiDao">
+<!--    从数据库取出按时间排序的前10个专题-->
+    <select id="getAllZhuanTi" resultType="dizhenshuju">
+        select * from t_dizhenshuju  where zhenji >=5 order by dizhentime  desc  limit 0,10;
+    </select>
+
+<!--    根据专题Id取出该专题信息-->
+    <select id="getZhuanTiById" parameterType="integer" resultType="dizhenshuju">
+        select * from t_dizhenshuju  where dizhenshujuid=#{id};
+    </select>
+</mapper>

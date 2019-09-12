@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bunfly.dizhen.dao.IZhiBoDao">
+<!--    在数据库添加直播信息-->
+    <insert id="addZhiBo" parameterType="zhibo" >
+  			insert into t_zhibo
+  				(zhibotitle,zhibolaiyuan,zhibotime,zhibocontent,userid,zhuantiid,zhuantiname)
+  			value
+  				(#{zhibotitle},#{zhibolaiyuan},#{zhibotime},#{zhibocontent},#{userid},#{zhuantiid},#{zhuantiname});
+    </insert>
+<!--    根据直播id在数据库删除该直播信息-->
+    <delete id="deleteZhiBo" parameterType="integer">
+            delete from t_zhibo where zhiboid=#{id};
+    </delete>
+<!--    分页的数据量-->
+    <select id="queryPage"  resultType="zhibo">
+            SELECT
+  				zhiboid,
+  				zhibotitle,
+  				zhibolaiyuan,
+  				zhibotime,
+  				zhibocontent,
+  				userid,
+  				zhuantiid,
+  				zhuantiname
+  			FROM
+  				t_zhibo
+  			WHERE
+  				userid=#{userid}
+  			LIMIT
+  				#{pageModel.begin},#{pageModel.pageSize};
+    </select>
+<!--    总共有多少用户-->
+    <select id="queryCount" parameterType="integer" resultType="integer">
+			SELECT
+				count(1)
+			FROM
+				t_zhibo
+			Where
+			userid=#{id};
+		</select>
+<!--	根据专题id取出取出该专题的直播信息-->
+	<select id="getZhiBoByZid" parameterType="integer" resultType="zhibo">
+		select * from t_zhibo where zhuantiid=#{id};
+	</select>
+</mapper>

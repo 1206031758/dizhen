@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bunfly.dizhen.dao.INewsDao">
+<!--    添加行业新闻-->
+    <insert id="addNews" parameterType="news" >
+  			insert into t_news
+  				(newstitle,newscontent,userid,shangchuantime)
+  			value
+  				(#{newstitle},#{newscontent},#{userid},#{shangchuantime});
+    </insert>
+<!--    根据用户id查询出该用户上传的新闻-->
+    <select id="queryPage"  resultType="news">
+            SELECT
+  				newsid,
+  				newstitle,
+  				newscontent,
+  				userid,
+  				shangchuantime
+  			FROM
+  				t_news
+  			WHERE
+  				userid=#{userid}
+  			LIMIT
+  				#{pageModel.begin},#{pageModel.pageSize};
+    </select>
+    <!-- 总共有多少用户 -->
+    <select id="queryCount" parameterType="integer" resultType="integer">
+			SELECT
+				count(1)
+			FROM
+				t_news
+			Where
+			userid=#{id};
+		</select>
+<!--    根据新闻id删除该新闻-->
+    <delete id="deleteNews" parameterType="integer">
+            delete from t_news where newsid=#{id};
+    </delete>
+<!--	按时间顺序取出最新的10条新闻-->
+	<select id="getNewsByTime" resultType="news">
+		select * from t_news order by shangchuantime desc limit 0,10;
+	</select>
+<!--	根据id取出该新闻-->
+	<select id="getNewsById" parameterType="integer" resultType="news">
+		select * from t_news where newsid=#{id};
+	</select>
+</mapper>

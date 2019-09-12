@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.bunfly.dizhen.dao.IRoleDao">
+    <!-- 根据userid查询出该用户对于的角色 -->
+    <select id="queryRole" parameterType="integer" resultMap="Rolemap">
+        SELECT
+        r.roleid,
+        rolename,
+        rolememo,
+        userid
+        FROM
+        t_role r
+        LEFT JOIN
+        user_role ru   <!--  左连接中间表 -->
+        ON
+        r.roleid=ru.roleid
+        WHERE
+        userid=#{id};
+    </select>
+
+    <resultMap type="role" id="Rolemap">
+        <id property="roleid" column="roleid"/>
+        <result property="rolename" column="rolename"/>
+        <result property="rolememo" column="rolememo"/>
+        <collection property="menus" ofType="menu" select="com.bunfly.dizhen.dao.IMenuDao.queryMenu" column="roleid">
+            <id property="menuid" column="menuid"/>
+            <result property="menuname" column="menuname"/>
+            <result property="menulink" column="menulink"/>
+            <result property="menusecuryname" column="menusecuryname"/>
+            <result property="menupid" column="menupid"/>
+        </collection>
+    </resultMap>
+
+    <!-- 获取所有的角色名字和id -->
+    <select id="getALLRoleNameAndId" resultType="role">
+  		SELECT
+  			roleid,
+  			rolename
+  		FROM
+  			t_role;
+  	</select>
+</mapper>
